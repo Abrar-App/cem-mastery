@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CEM Mastery">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<link rel="stylesheet" href="./styles.css">
+<title>CEM Mastery</title>
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">CM</div><div><strong>CEM Mastery</strong><small>Exam Preparation</small></div></div>
+    <nav id="nav"></nav>
+    <div class="sync-note">Local-first • Offline ready</div>
+  </aside>
+  <main>
+    <header class="topbar">
+      <div><h1 id="pageTitle">Dashboard</h1><div id="subTitle" class="muted"></div></div>
+      <div class="top-actions">
+        <button id="themeBtn" class="icon-btn" title="Toggle theme">◐</button>
+        <button id="backupBtn" class="icon-btn" title="Backup">↥</button>
+      </div>
+    </header>
+    <section id="view"></section>
+  </main>
+  <nav id="mobileNav" class="mobile-nav"></nav>
+</div>
+<input id="importFile" type="file" accept=".json" hidden>
+<script src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1592 @@
+{
+  "sections": [
+    {
+      "id": 1,
+      "name": "Energy & Sustainability Policies, Codes & Standards",
+      "weight": "6–8%"
+    },
+    {
+      "id": 2,
+      "name": "Energy Rates, Tariffs & Supply Options",
+      "weight": "5–7%"
+    },
+    {
+      "id": 3,
+      "name": "Energy Audits & Instrumentation",
+      "weight": "7–11%"
+    },
+    {
+      "id": 4,
+      "name": "Energy Accounting & Economics",
+      "weight": "6–10%"
+    },
+    {
+      "id": 5,
+      "name": "Electrical Power Systems & Motors",
+      "weight": "7–11%"
+    },
+    {
+      "id": 6,
+      "name": "Lighting Systems",
+      "weight": "5–7%"
+    },
+    {
+      "id": 7,
+      "name": "HVAC Systems & Building Envelope",
+      "weight": "10–16%"
+    },
+    {
+      "id": 8,
+      "name": "Building Automation, Controls & AI Systems",
+      "weight": "6–10%"
+    },
+    {
+      "id": 9,
+      "name": "Energy Storage Systems",
+      "weight": "3–5%"
+    },
+    {
+      "id": 10,
+      "name": "Boiler & Steam Systems",
+      "weight": "4–6%"
+    },
+    {
+      "id": 11,
+      "name": "Distributed Generation & Renewable Energy Systems",
+      "weight": "4–6%"
+    },
+    {
+      "id": 12,
+      "name": "Industrial Systems",
+      "weight": "6–8%"
+    },
+    {
+      "id": 13,
+      "name": "Operations, Maintenance & Commissioning",
+      "weight": "7–11%"
+    },
+    {
+      "id": 14,
+      "name": "ESPC & Measurement & Verification",
+      "weight": "3–5%"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "L01-01",
+      "section": 1,
+      "title": "Sustainability, decarbonization & the energy manager",
+      "type": "Theory",
+      "minutes": 35,
+      "simple": "Energy management is no longer only about reducing utility bills. The current CEM scope also connects energy decisions with decarbonization, resilience, sustainability policy and reporting. The exam can test the role of the energy manager in these wider objectives.",
+      "detail": "Keep the concepts separate: efficiency reduces energy needed for the same service; electrification changes the energy carrier; renewable energy changes supply; decarbonization targets greenhouse-gas emissions; resilience is the ability to maintain or recover critical functions.",
+      "trap": "Do not assume every electrification project automatically reduces emissions. The electricity source and system efficiency matter."
+    },
+    {
+      "id": "L01-03",
+      "section": 1,
+      "title": "GHG accounting: Scope 1, 2 and 3",
+      "type": "Both",
+      "minutes": 50,
+      "simple": "Scope 1 is direct emissions from sources the organization owns or controls. Scope 2 is indirect emissions from purchased electricity, steam, heat or cooling. Scope 3 covers other indirect value-chain emissions.",
+      "detail": "A common calculation is activity data × emission factor. Emission factors must be source- and version-controlled because they can differ by geography, fuel and reporting framework.",
+      "formula": "Emissions = Activity Data × Emission Factor",
+      "trap": "Purchased electricity is generally Scope 2, not Scope 1."
+    },
+    {
+      "id": "L02-03",
+      "section": 2,
+      "title": "Utility tariffs: energy, demand, TOU and ratchets",
+      "type": "Both",
+      "minutes": 55,
+      "simple": "Energy charges depend on how much energy you consume. Demand charges depend on how high your demand reaches. Time-of-use tariffs change the price depending on when energy is used.",
+      "detail": "For a ratchet tariff, billing demand can depend on a percentage of a previous peak. Always calculate the ratchet demand and compare it with current measured demand before applying the demand rate.",
+      "formula": "Energy Cost = kWh × Energy Rate; Demand Cost = Billing kW × Demand Rate",
+      "trap": "A project can reduce peak kW and demand cost even if monthly kWh barely changes."
+    },
+    {
+      "id": "L02-04",
+      "section": 2,
+      "title": "Point-of-use energy cost",
+      "type": "Both",
+      "minutes": 50,
+      "simple": "Two fuels cannot be compared fairly until they are converted to the same useful-energy basis.",
+      "detail": "Convert each purchased energy source to a common unit, then divide the purchased-energy cost by end-use efficiency.",
+      "formula": "Cost per useful energy = Purchased-energy unit cost ÷ Efficiency",
+      "trap": "Do not compare only the fuel purchase price when equipment efficiencies differ."
+    },
+    {
+      "id": "L03-01",
+      "section": 3,
+      "title": "Energy audit structure",
+      "type": "Theory",
+      "minutes": 40,
+      "simple": "An energy audit connects facility operation, measured data, energy use and economics to identify practical energy conservation measures.",
+      "detail": "Start with utility history and operating schedules, walk the facility, identify major loads, select measurements that reduce uncertainty, quantify opportunities, then evaluate economics and implementation constraints.",
+      "trap": "A benchmark can tell you that performance is unusual, but it does not by itself identify the cause."
+    },
+    {
+      "id": "L03-03",
+      "section": 3,
+      "title": "Instrumentation selection",
+      "type": "Theory",
+      "minutes": 45,
+      "simple": "Choose the instrument from the physical quantity you need: power, temperature, humidity, pressure, flow, air velocity, light or combustion.",
+      "detail": "For variable electrical loads, a power analyzer/logger may be more useful than a single clamp-current reading. For airflow, representative traverse or suitable velocity/pressure measurement matters.",
+      "trap": "Current alone is not equal to real power."
+    },
+    {
+      "id": "L04-01",
+      "section": 4,
+      "title": "Time value of money",
+      "type": "Both",
+      "minutes": 50,
+      "simple": "Future money is worth less than money today, so long-term projects use discounting.",
+      "detail": "CEM questions commonly use factor tables. Read (P/A,i,n) as 'present worth P given a uniform annual amount A, interest rate i and n years.'",
+      "formula": "P = A × (P/A, i, n)",
+      "trap": "Do not use simple payback if the question asks for NPV, present worth, annual worth, SIR or IRR."
+    },
+    {
+      "id": "L04-03",
+      "section": 4,
+      "title": "NPV, SIR and IRR",
+      "type": "Both",
+      "minutes": 55,
+      "simple": "NPV compares discounted benefits with discounted costs. SIR is a benefit-to-cost ratio. IRR is the discount rate that makes NPV equal zero.",
+      "formula": "NPV = PV(Benefits) − PV(Costs); SIR = PV(Savings) ÷ PV(Costs)",
+      "trap": "A positive NPV and SIR above 1 indicate different but related economic tests."
+    },
+    {
+      "id": "L05-01",
+      "section": 5,
+      "title": "kW, kVA, kVAR and power factor",
+      "type": "Both",
+      "minutes": 55,
+      "simple": "kW is real power, kVAR is reactive power and kVA is apparent power. Power factor tells you how much of apparent power is doing real work.",
+      "formula": "PF = kW ÷ kVA; kVA² = kW² + kVAR²",
+      "detail": "Improving power factor reduces current and kVA upstream of the capacitor, but does not reduce the real kW required for the same shaft work.",
+      "trap": "Do not confuse lower current with lower real motor load."
+    },
+    {
+      "id": "L05-02",
+      "section": 5,
+      "title": "Three-phase power",
+      "type": "Both",
+      "minutes": 50,
+      "formula": "kW = √3 × kV × I × PF",
+      "simple": "Balanced three-phase real power uses line-to-line voltage, line current and power factor.",
+      "trap": "If you enter voltage in volts while expecting kW, you will be off by a factor of 1000."
+    },
+    {
+      "id": "L05-03",
+      "section": 5,
+      "title": "Power-factor correction",
+      "type": "Both",
+      "minutes": 55,
+      "formula": "Capacitor kVAR = kW × [tan(cos⁻¹ PFold) − tan(cos⁻¹ PFnew)]",
+      "simple": "A capacitor supplies reactive power locally so the upstream system carries less reactive current.",
+      "trap": "Subtracting the power-factor percentages directly is not a valid kVAR calculation."
+    },
+    {
+      "id": "L05-06",
+      "section": 5,
+      "title": "Motor slip and load",
+      "type": "Both",
+      "minutes": 45,
+      "formula": "Load ≈ (Nsync − Nmeasured) ÷ (Nsync − Nfull-load)",
+      "simple": "Induction motors run slightly below synchronous speed. As load increases, slip generally increases.",
+      "trap": "Use the correct synchronous speed before calculating slip."
+    },
+    {
+      "id": "L05-07",
+      "section": 5,
+      "title": "VFDs and affinity laws",
+      "type": "Both",
+      "minutes": 55,
+      "formula": "Flow ∝ Speed; Head ∝ Speed²; Power ∝ Speed³",
+      "simple": "For centrifugal fans and pumps, reducing speed can reduce power much faster than it reduces flow.",
+      "trap": "Do not use the cube law blindly for every motor-driven load."
+    },
+    {
+      "id": "L06-01",
+      "section": 6,
+      "title": "Lighting quantities",
+      "type": "Both",
+      "minutes": 45,
+      "simple": "Lumens measure luminous flux. Lux measures illuminance on a surface. Efficacy is lumens per watt. CCT and CRI describe different qualities of light.",
+      "trap": "High CCT does not imply high CRI."
+    },
+    {
+      "id": "L06-03",
+      "section": 6,
+      "title": "Lumen method, CU and LLF",
+      "type": "Both",
+      "minutes": 55,
+      "formula": "Average lux = Lamps × Lumens/lamp × CU × LLF ÷ Area",
+      "simple": "Coefficient of utilization accounts for how much lamp light reaches the work plane. Light loss factor accounts for depreciation and losses.",
+      "trap": "Use CU and LLF as fractions unless explicitly converted."
+    },
+    {
+      "id": "L06-05",
+      "section": 6,
+      "title": "SPD and human-centric lighting",
+      "type": "Theory",
+      "minutes": 35,
+      "simple": "Spectral power distribution describes how a source's optical power is distributed across wavelength. Sources can have similar CCT yet different spectra.",
+      "detail": "The current CEM scope includes human-centric lighting and pupil-lumen terminology. This app keeps pupil-lumen formula questions out of scored practice until a sufficiently authoritative direct formula source is verified.",
+      "trap": "Do not treat SPD, CCT and CRI as interchangeable."
+    },
+    {
+      "id": "L07-01",
+      "section": 7,
+      "title": "Vapor-compression cycle",
+      "type": "Theory",
+      "minutes": 45,
+      "simple": "The evaporator absorbs heat, the compressor raises refrigerant pressure, the condenser rejects heat and the expansion device drops pressure before the evaporator.",
+      "trap": "Heat-rejection equipment belongs on the high-pressure side after compression."
+    },
+    {
+      "id": "L07-03",
+      "section": 7,
+      "title": "COP, EER and kW/ton",
+      "type": "Both",
+      "minutes": 55,
+      "formula": "COP = Cooling moved ÷ Input power; kW/ton = 3.517 ÷ COP",
+      "simple": "COP compares useful cooling to input. kW/ton expresses electrical input per refrigeration ton.",
+      "trap": "Lower kW/ton is better; higher COP is better."
+    },
+    {
+      "id": "L07-07",
+      "section": 7,
+      "title": "Air and water heat transfer",
+      "type": "Both",
+      "minutes": 55,
+      "formula": "Air sensible: q(W) ≈ L/s × 1.2 × ΔT; Water: q(kW) ≈ L/s × 4.2 × ΔT",
+      "simple": "Use the air equation for sensible-only air-temperature changes and the water equation for chilled/hot-water sensible heat.",
+      "trap": "L/min must be converted to L/s before using the water shortcut."
+    },
+    {
+      "id": "L07-08",
+      "section": 7,
+      "title": "Psychrometric chart fundamentals",
+      "type": "Both",
+      "minutes": 60,
+      "simple": "A psychrometric chart links dry bulb, wet bulb, relative humidity, humidity ratio, dew point, enthalpy and specific volume.",
+      "detail": "Locate the state from two independent properties. Dew point is found by moving horizontally at constant humidity ratio to saturation. Pure sensible heating moves horizontally toward higher dry-bulb temperature.",
+      "trap": "Relative humidity does not stay constant during sensible heating."
+    },
+    {
+      "id": "L07-10",
+      "section": 7,
+      "title": "Envelope R, U and heat transfer",
+      "type": "Both",
+      "minutes": 55,
+      "formula": "R = L/k; U = 1/ΣR; q = U × A × ΔT",
+      "simple": "R resists heat flow. U conducts heat through the complete assembly.",
+      "trap": "Do not use R directly in q = U A ΔT."
+    },
+    {
+      "id": "L07-11",
+      "section": 7,
+      "title": "Degree days and seasonal heat transfer",
+      "type": "Both",
+      "minutes": 55,
+      "formula": "Seasonal Q ≈ U × A × Degree Days × 24",
+      "simple": "Degree-day methods estimate seasonal conduction from a building load coefficient and climate severity.",
+      "trap": "Apply equipment efficiency or COP after the building heat-transfer requirement if the question asks for input energy."
+    },
+    {
+      "id": "L08-01",
+      "section": 8,
+      "title": "Control loops and PID",
+      "type": "Theory",
+      "minutes": 45,
+      "simple": "A controller compares a measured value to a setpoint and adjusts an actuator to reduce error. P reacts to present error, I to accumulated error and D to rate of change.",
+      "trap": "Deadband is not the same as sensor accuracy."
+    },
+    {
+      "id": "L08-04",
+      "section": 8,
+      "title": "BACnet and open systems",
+      "type": "Theory",
+      "minutes": 40,
+      "simple": "BACnet is a data communication protocol used by building automation and control systems.",
+      "detail": "For exam preparation, focus on interoperability, data exchange and why open communication matters for integrated building control.",
+      "trap": "A protocol does not automatically guarantee good sequence-of-operation design."
+    },
+    {
+      "id": "L08-07",
+      "section": 8,
+      "title": "BAS / OT cybersecurity",
+      "type": "Theory",
+      "minutes": 35,
+      "simple": "Building automation is operational technology because it controls physical building processes.",
+      "detail": "Cybersecurity must consider access control, segmentation, remote access, updates, inventories, reliability and safety.",
+      "trap": "Protecting only office IT does not secure BAS."
+    },
+    {
+      "id": "L09-01",
+      "section": 9,
+      "title": "Thermal storage strategies",
+      "type": "Both",
+      "minutes": 45,
+      "simple": "Full storage shifts most target cooling production away from the peak period. Partial storage shares the peak between storage and chillers.",
+      "trap": "Storage can reduce demand cost without necessarily reducing total energy use."
+    },
+    {
+      "id": "L09-03",
+      "section": 9,
+      "title": "Battery storage applications",
+      "type": "Theory",
+      "minutes": 40,
+      "simple": "Battery storage can support peak shaving, time shifting, renewable-energy shifting and resilience.",
+      "trap": "kW is power capability; kWh is stored energy."
+    },
+    {
+      "id": "L10-01",
+      "section": 10,
+      "title": "Boiler efficiency & combustion",
+      "type": "Both",
+      "minutes": 50,
+      "formula": "Efficiency = Useful heat output ÷ Fuel input",
+      "simple": "For a required useful output, divide by efficiency to determine fuel input.",
+      "trap": "Multiplying by efficiency when solving for input gives the wrong direction."
+    },
+    {
+      "id": "L10-03",
+      "section": 10,
+      "title": "Steam tables",
+      "type": "Both",
+      "minutes": 60,
+      "simple": "Identify pressure/temperature and whether the state is saturated liquid, saturated vapor or superheated, then select the required enthalpy.",
+      "formula": "Heat rate = mass flow × (hout − hin)",
+      "trap": "hf, hfg and hg are different properties."
+    },
+    {
+      "id": "L10-04",
+      "section": 10,
+      "title": "Condensate, traps, blowdown and flash steam",
+      "type": "Both",
+      "minutes": 55,
+      "simple": "Returning hot condensate recovers heat and treated water. Failed traps and excessive blowdown waste energy.",
+      "trap": "A steam trap can fail open or closed, with different consequences."
+    },
+    {
+      "id": "L11-01",
+      "section": 11,
+      "title": "CHP fundamentals",
+      "type": "Both",
+      "minutes": 50,
+      "formula": "Overall useful efficiency = (Electric output + Useful heat output) ÷ Fuel input",
+      "simple": "CHP uses one fuel input to create useful electrical/mechanical output and recoverable thermal energy.",
+      "trap": "Electrical efficiency alone is not overall CHP efficiency."
+    },
+    {
+      "id": "L11-04",
+      "section": 11,
+      "title": "Microgrids and building-to-grid",
+      "type": "Theory",
+      "minutes": 45,
+      "simple": "Microgrids coordinate loads and distributed resources within a defined electrical boundary. Grid-interactive buildings use controls and flexibility to respond to building and grid needs.",
+      "trap": "A microgrid is more than a building with rooftop PV."
+    },
+    {
+      "id": "L11-05",
+      "section": 11,
+      "title": "Green hydrogen",
+      "type": "Theory",
+      "minutes": 30,
+      "simple": "Electrolysis uses electricity to split water into hydrogen and oxygen. Hydrogen is an energy carrier.",
+      "trap": "Electrolytic hydrogen is not automatically zero-emission; electricity source matters."
+    },
+    {
+      "id": "L12-01",
+      "section": 12,
+      "title": "Pumps and system curves",
+      "type": "Both",
+      "minutes": 55,
+      "simple": "Pump operation is determined by the interaction between pump performance and the system curve.",
+      "formula": "Under affinity-law assumptions: Flow ∝ speed; Head ∝ speed²; Power ∝ speed³",
+      "trap": "Throttling and speed reduction can produce very different energy results."
+    },
+    {
+      "id": "L12-02",
+      "section": 12,
+      "title": "Compressed air systems",
+      "type": "Both",
+      "minutes": 50,
+      "simple": "Compressed air is an expensive utility. Leaks, excessive pressure, poor sequencing and inappropriate end uses create avoidable demand.",
+      "trap": "A pressure reduction can save energy even if production demand is unchanged."
+    },
+    {
+      "id": "L12-05",
+      "section": 12,
+      "title": "Industrial refrigeration",
+      "type": "Both",
+      "minutes": 40,
+      "simple": "Industrial refrigeration should be optimized as a system: compressors, condensers, evaporators and controls interact.",
+      "trap": "Optimizing one component does not guarantee minimum system energy."
+    },
+    {
+      "id": "L12-06",
+      "section": 12,
+      "title": "Waste heat recovery",
+      "type": "Both",
+      "minutes": 45,
+      "formula": "q = mass flow × Cp × ΔT",
+      "simple": "Waste heat is valuable only if temperature level, quantity, timing and a useful heat sink align.",
+      "trap": "Use temperature difference, not final temperature."
+    },
+    {
+      "id": "L13-01",
+      "section": 13,
+      "title": "Maintenance strategies",
+      "type": "Theory",
+      "minutes": 40,
+      "simple": "Reactive maintenance occurs after failure. Preventive maintenance is scheduled. Predictive maintenance uses condition/performance data.",
+      "trap": "Scheduled work is preventive even if it prevents failures; predictive requires condition information."
+    },
+    {
+      "id": "L13-04",
+      "section": 13,
+      "title": "Commissioning and retro-commissioning",
+      "type": "Theory",
+      "minutes": 50,
+      "simple": "Commissioning verifies that systems meet requirements. Retro-commissioning applies a similar process to an existing facility that did not receive comparable commissioning originally.",
+      "trap": "Recommissioning and retro-commissioning are not identical terms."
+    },
+    {
+      "id": "L14-03",
+      "section": 14,
+      "title": "M&V principles and baselines",
+      "type": "Both",
+      "minutes": 50,
+      "formula": "Savings = Adjusted baseline energy − Reporting-period energy",
+      "simple": "Savings are not directly metered. They are determined by comparing actual performance with an appropriate adjusted baseline.",
+      "trap": "Raw historical consumption may need adjustment for weather, production or other independent variables."
+    },
+    {
+      "id": "L14-02",
+      "section": 14,
+      "title": "ESPC and contract structures",
+      "type": "Theory",
+      "minutes": 45,
+      "simple": "Performance contracting combines energy-saving measures with financing, commercial terms and savings responsibility.",
+      "trap": "Technical savings, financial economics and contractual guarantees are separate concepts."
+    }
+  ],
+  "questions": [
+    {
+      "id": "Q001",
+      "section": 4,
+      "type": "Numerical",
+      "difficulty": "Medium",
+      "q": "A measure saves $18,000/year for 10 years. If the P/A factor is 6.145, what is the maximum acceptable first cost?",
+      "options": [
+        "$69,200",
+        "$90,000",
+        "$110,610",
+        "$180,000"
+      ],
+      "answer": 2,
+      "solution": "Present worth = annual savings × P/A factor = 18,000 × 6.145 = $110,610.",
+      "trap": "Using simple payback instead of the supplied discount factor.",
+      "target": 75
+    },
+    {
+      "id": "Q002",
+      "section": 5,
+      "type": "Numerical",
+      "difficulty": "Medium",
+      "q": "An 800 kW load improves power factor from 0.70 to 0.95. Approximately how much capacitor kVAR is required?",
+      "options": [
+        "241 kVAR",
+        "553 kVAR",
+        "800 kVAR",
+        "1,140 kVAR"
+      ],
+      "answer": 1,
+      "solution": "kVAR = 800[tan(cos⁻¹0.70) − tan(cos⁻¹0.95)] ≈ 553 kVAR.",
+      "trap": "Subtracting PF values directly.",
+      "target": 110
+    },
+    {
+      "id": "Q003",
+      "section": 5,
+      "type": "Numerical",
+      "difficulty": "Medium",
+      "q": "A centrifugal fan uses 18 kW. If speed is reduced to 80%, estimate new power using affinity laws.",
+      "options": [
+        "14.4 kW",
+        "11.5 kW",
+        "9.22 kW",
+        "3.60 kW"
+      ],
+      "answer": 2,
+      "solution": "Power ratio = speed ratio³. New power = 18 × 0.8³ = 9.216 kW.",
+      "trap": "Using a linear relationship for power.",
+      "target": 70
+    },
+    {
+      "id": "Q004",
+      "section": 6,
+      "type": "Numerical",
+      "difficulty": "Medium",
+      "q": "40 lamps each produce 3,200 lm. CU=0.60, LLF=0.80, area=200 m². Estimate average illuminance.",
+      "options": [
+        "192 lux",
+        "256 lux",
+        "307.2 lux",
+        "384 lux"
+      ],
+      "answer": 2,
+      "solution": "E = 40×3200×0.60×0.80 / 200 = 307.2 lux.",
+      "trap": "Omitting CU or LLF.",
+      "target": 90
+    },
+    {
+      "id": "Q005",
+      "section": 7,
+      "type": "Numerical",
+      "difficulty": "Easy",
+      "q": "Airflow is 4,000 L/s and temperature rises by 8°C. Using q = L/s × 1.2 × ΔT, estimate heat added.",
+      "options": [
+        "3.84 kW",
+        "38.4 kW",
+        "384 kW",
+        "4,800 kW"
+      ],
+      "answer": 1,
+      "solution": "q = 4000 × 1.2 × 8 = 38,400 W = 38.4 kW.",
+      "trap": "Reporting watts as kilowatts.",
+      "target": 60
+    },
+    {
+      "id": "Q006",
+      "section": 7,
+      "type": "Numerical",
+      "difficulty": "Medium",
+      "q": "A 600 ton chiller operates at COP 5.0. Estimate electrical input.",
+      "options": [
+        "120 kW",
+        "211 kW",
+        "422 kW",
+        "1,758 kW"
+      ],
+      "answer": 2,
+      "solution": "kW/ton = 3.517/5 = 0.7034. Input = 600×0.7034 ≈ 422 kW.",
+      "trap": "Multiplying tonnage by COP.",
+      "target": 100
+    },
+    {
+      "id": "Q007",
+      "section": 7,
+      "type": "Numerical",
+      "difficulty": "Medium",
+      "q": "A homogeneous insulation layer is 0.12 m thick with k=0.04 W/m·K. Find its R-value.",
+      "options": [
+        "0.0033",
+        "0.48",
+        "3.0",
+        "4.8"
+      ],
+      "answer": 2,
+      "solution": "R = L/k = 0.12/0.04 = 3.0 m²·K/W.",
+      "trap": "Using k/L.",
+      "target": 60
+    },
+    {
+      "id": "Q008",
+      "section": 7,
+      "type": "Numerical",
+      "difficulty": "Hard",
+      "q": "A 120 m² wall has U=0.35 W/m²·K and ΔT=20°C. Find instantaneous conduction heat transfer.",
+      "options": [
+        "84 W",
+        "420 W",
+        "840 W",
+        "2.4 kW"
+      ],
+      "answer": 2,
+      "solution": "q=UAΔT=0.35×120×20=840 W.",
+      "trap": "Using a seasonal degree-day relationship.",
+      "target": 80
+    },
+    {
+      "id": "Q009",
+      "section": 12,
+      "type": "Numerical",
+      "difficulty": "Medium",
+      "q": "Waste air flows at 60 lb/min, Cp=0.3 Btu/lb°F and cools from 700°F to 250°F. Estimate available sensible heat.",
+      "options": [
+        "4,050 Btu/min",
+        "8,100 Btu/min",
+        "12,600 Btu/min",
+        "17,100 Btu/min"
+      ],
+      "answer": 1,
+      "solution": "q=60×0.3×(700−250)=8,100 Btu/min.",
+      "trap": "Using final temperature instead of ΔT.",
+      "target": 85
+    },
+    {
+      "id": "Q010",
+      "section": 13,
+      "type": "Theory",
+      "difficulty": "Easy",
+      "q": "Which maintenance approach primarily uses condition data such as vibration or temperature trends to determine intervention timing?",
+      "options": [
+        "Reactive",
+        "Preventive",
+        "Predictive",
+        "Emergency"
+      ],
+      "answer": 2,
+      "solution": "Predictive maintenance uses condition/performance information to decide when intervention is needed.",
+      "trap": "Confusing scheduled preventive maintenance with condition-based maintenance.",
+      "target": 45
+    },
+    {
+      "id": "Q011",
+      "section": 1,
+      "type": "Theory",
+      "difficulty": "Medium",
+      "q": "Purchased electricity emissions are normally categorized under which GHG Protocol scope?",
+      "options": [
+        "Scope 1",
+        "Scope 2",
+        "Scope 3 only",
+        "Not categorized"
+      ],
+      "answer": 1,
+      "solution": "Scope 2 covers indirect emissions associated with purchased electricity, steam, heat or cooling.",
+      "trap": "Choosing Scope 1 because electricity is consumed onsite.",
+      "target": 45
+    },
+    {
+      "id": "Q012",
+      "section": 8,
+      "type": "Theory",
+      "difficulty": "Medium",
+      "q": "Why should BAS cybersecurity consider reliability and safety as well as confidentiality?",
+      "options": [
+        "BAS is only a reporting system",
+        "BAS is operational technology controlling physical processes",
+        "BAS has no network connection",
+        "Confidentiality is irrelevant"
+      ],
+      "answer": 1,
+      "solution": "Building automation is operational technology and can affect physical building operation, reliability and safety.",
+      "trap": "Applying only office-IT thinking.",
+      "target": 55
+    },
+    {
+      "id": "Q013",
+      "section": 3,
+      "type": "Theory",
+      "difficulty": "Medium",
+      "q": "You need true three-phase real power on a variable load. Is a clamp-current reading alone sufficient?",
+      "options": [
+        "Yes, always",
+        "No; voltage and power factor/phase information are also needed",
+        "Yes, if motor is large",
+        "Only if load factor is known"
+      ],
+      "answer": 1,
+      "solution": "Current alone does not establish real kW. Real power requires voltage and power-factor/phase information or an appropriate power analyzer.",
+      "trap": "Treating amperes as power.",
+      "target": 50
+    },
+    {
+      "id": "Q014",
+      "section": 8,
+      "type": "Theory",
+      "difficulty": "Medium",
+      "q": "What is the main purpose of deadband between heating and cooling setpoints?",
+      "options": [
+        "Improve sensor calibration",
+        "Avoid simultaneous or rapid opposing operation",
+        "Increase airflow",
+        "Raise power factor"
+      ],
+      "answer": 1,
+      "solution": "Deadband provides a neutral range between heating and cooling commands, reducing hunting and unnecessary energy use.",
+      "trap": "Confusing deadband with sensor accuracy.",
+      "target": 50
+    },
+    {
+      "id": "Q015",
+      "section": 9,
+      "type": "Theory",
+      "difficulty": "Medium",
+      "q": "Which battery-storage use most directly reduces a facility's billed peak demand?",
+      "options": [
+        "Charge during peak",
+        "Discharge during peak",
+        "Increase baseload",
+        "Reduce battery capacity"
+      ],
+      "answer": 1,
+      "solution": "Discharging during the peak can offset grid demand and reduce the billed peak.",
+      "trap": "Charging during the peak.",
+      "target": 45
+    },
+    {
+      "id": "Q016",
+      "section": 10,
+      "type": "Numerical",
+      "difficulty": "Medium",
+      "q": "A boiler delivers 1,200 kW useful heat at 80% efficiency. Estimate fuel input rate.",
+      "options": [
+        "960 kW",
+        "1,200 kW",
+        "1,500 kW",
+        "2,000 kW"
+      ],
+      "answer": 2,
+      "solution": "Input = useful output / efficiency = 1200/0.80 = 1500 kW.",
+      "trap": "Multiplying output by efficiency.",
+      "target": 60
+    },
+    {
+      "id": "Q017",
+      "section": 11,
+      "type": "Numerical",
+      "difficulty": "Medium",
+      "q": "A CHP unit uses 1,000 kW fuel input and produces 320 kW electricity plus 480 kW useful heat. What is overall useful efficiency?",
+      "options": [
+        "32%",
+        "48%",
+        "68%",
+        "80%"
+      ],
+      "answer": 3,
+      "solution": "Overall useful efficiency=(320+480)/1000=80%.",
+      "trap": "Counting only electrical output.",
+      "target": 70
+    },
+    {
+      "id": "Q018",
+      "section": 12,
+      "type": "Numerical",
+      "difficulty": "Medium",
+      "q": "A centrifugal pump requires 40 kW at full speed. Estimate power at 90% speed under affinity-law assumptions.",
+      "options": [
+        "36.0 kW",
+        "32.4 kW",
+        "29.16 kW",
+        "20.0 kW"
+      ],
+      "answer": 2,
+      "solution": "40×0.9³=29.16 kW.",
+      "trap": "Using a linear 10% reduction.",
+      "target": 70
+    },
+    {
+      "id": "Q019",
+      "section": 13,
+      "type": "Theory",
+      "difficulty": "Medium",
+      "q": "An older building was never formally commissioned. A structured process is now used to verify and optimize existing systems. What is this commonly called?",
+      "options": [
+        "Recommissioning",
+        "Retro-commissioning",
+        "Reactive commissioning",
+        "Seasonal maintenance"
+      ],
+      "answer": 1,
+      "solution": "Retro-commissioning applies commissioning principles to an existing facility that did not receive comparable commissioning originally.",
+      "trap": "Calling every repeat commissioning activity recommissioning.",
+      "target": 45
+    },
+    {
+      "id": "Q020",
+      "section": 14,
+      "type": "Theory",
+      "difficulty": "Medium",
+      "q": "Why may baseline energy need adjustment before comparing it with reporting-period energy?",
+      "options": [
+        "To guarantee savings",
+        "Because conditions affecting energy use may have changed",
+        "To increase utility rates",
+        "Because meters cannot measure energy"
+      ],
+      "answer": 1,
+      "solution": "Weather, production, occupancy and other independent variables can change and may require baseline adjustment.",
+      "trap": "Assuming any observed reduction equals project savings.",
+      "target": 55
+    },
+    {
+      "id": "Q021",
+      "section": 1,
+      "type": "Numerical",
+      "difficulty": "Easy",
+      "q": "A facility uses 200,000 kWh of purchased electricity. If a supplied emission factor is 0.40 kg CO₂e/kWh, calculate associated emissions.",
+      "options": [
+        "50,000 kg",
+        "80,000 kg",
+        "200,000 kg",
+        "500,000 kg"
+      ],
+      "answer": 1,
+      "solution": "Emissions = activity data × emission factor = 200,000×0.40 = 80,000 kg CO₂e.",
+      "trap": "Dividing by the emission factor.",
+      "target": 55
+    },
+    {
+      "id": "Q022",
+      "section": 7,
+      "type": "Numerical",
+      "difficulty": "Medium",
+      "q": "Chilled water flows at 25 L/s with a 5°C temperature rise. Estimate cooling rate using q=L/s×4.2×ΔT.",
+      "options": [
+        "105 kW",
+        "210 kW",
+        "525 kW",
+        "2,100 kW"
+      ],
+      "answer": 2,
+      "solution": "25×4.2×5 = 525 kW.",
+      "trap": "Treating L/s as L/min.",
+      "target": 70
+    },
+    {
+      "id": "Q023",
+      "section": 7,
+      "type": "Theory",
+      "difficulty": "Medium",
+      "q": "On a psychrometric chart, a purely sensible heating process moves primarily in which direction?",
+      "options": [
+        "Horizontally to higher dry-bulb at constant humidity ratio",
+        "Vertically upward at constant dry bulb",
+        "Along saturation curve",
+        "Horizontally to lower dry bulb"
+      ],
+      "answer": 0,
+      "solution": "Pure sensible heating adds no moisture, so humidity ratio stays approximately constant while dry-bulb temperature rises.",
+      "trap": "Following a constant-relative-humidity curve.",
+      "target": 55
+    },
+    {
+      "id": "Q024",
+      "section": 7,
+      "type": "Numerical",
+      "difficulty": "Medium",
+      "q": "A roof has total R=4.0 m²·K/W, area=500 m² and ΔT=18°C. Estimate conductive heat transfer.",
+      "options": [
+        "1.13 kW",
+        "2.25 kW",
+        "4.50 kW",
+        "36 kW"
+      ],
+      "answer": 1,
+      "solution": "U=1/R=0.25. q=0.25×500×18=2250 W=2.25 kW.",
+      "trap": "Using R directly as U.",
+      "target": 75
+    },
+    {
+      "id": "Q025",
+      "section": 5,
+      "type": "Numerical",
+      "difficulty": "Medium",
+      "q": "A 400 kW load operates at PF 0.80. What apparent power is required?",
+      "options": [
+        "320 kVA",
+        "400 kVA",
+        "500 kVA",
+        "625 kVA"
+      ],
+      "answer": 2,
+      "solution": "kVA=kW/PF=400/0.80=500 kVA.",
+      "trap": "Multiplying kW by PF.",
+      "target": 55
+    },
+    {
+      "id": "Q026",
+      "section": 4,
+      "type": "Numerical",
+      "difficulty": "Easy",
+      "q": "A $90,000 measure saves $30,000/year before considering discounting. What is simple payback?",
+      "options": [
+        "2 years",
+        "3 years",
+        "4 years",
+        "6 years"
+      ],
+      "answer": 1,
+      "solution": "Simple payback=90,000/30,000=3 years.",
+      "trap": "Using an interest factor when none is requested.",
+      "target": 45
+    },
+    {
+      "id": "Q027",
+      "section": 11,
+      "type": "Theory",
+      "difficulty": "Easy",
+      "q": "Is hydrogen produced by electrolysis automatically zero-emission?",
+      "options": [
+        "Yes",
+        "No",
+        "Only below 1 MW",
+        "Only in a microgrid"
+      ],
+      "answer": 1,
+      "solution": "Electrolysis uses electricity. Associated emissions depend strongly on how that electricity is produced and on the accounting boundary.",
+      "trap": "Assuming no combustion means no upstream emissions.",
+      "target": 45
+    },
+    {
+      "id": "Q028",
+      "section": 10,
+      "type": "Theory",
+      "difficulty": "Medium",
+      "q": "Why is condensate return generally valuable in a steam system?",
+      "options": [
+        "It increases blowdown",
+        "It recovers hot treated water",
+        "It lowers steam pressure",
+        "It eliminates all traps"
+      ],
+      "answer": 1,
+      "solution": "Returned condensate retains sensible heat and has already been treated, reducing makeup-water heating and treatment requirements.",
+      "trap": "Considering only water cost.",
+      "target": 55
+    },
+    {
+      "id": "Q029",
+      "section": 6,
+      "type": "Theory",
+      "difficulty": "Medium",
+      "q": "Which statement about CCT and CRI is correct?",
+      "options": [
+        "High CCT guarantees high CRI",
+        "They describe different lighting properties",
+        "CRI is measured in kelvin",
+        "They are identical for LEDs"
+      ],
+      "answer": 1,
+      "solution": "CCT describes color appearance while CRI describes color rendering; they are not the same metric.",
+      "trap": "Equating color temperature with color rendering.",
+      "target": 45
+    },
+    {
+      "id": "Q030",
+      "section": 3,
+      "type": "Theory",
+      "difficulty": "Easy",
+      "q": "What does a poor EUI benchmark prove?",
+      "options": [
+        "The HVAC must be inefficient",
+        "The facility deserves a retrofit",
+        "The facility should be investigated further",
+        "The utility meter is wrong"
+      ],
+      "answer": 2,
+      "solution": "A benchmark is a screening indicator. It can signal unusual performance but does not identify a specific cause.",
+      "trap": "Treating a benchmark as diagnosis.",
+      "target": 45
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "F001",
+      "section": 4,
+      "front": "What does (P/A,i,n) mean?",
+      "back": "Present worth P given a uniform annual amount A, interest rate i and n periods."
+    },
+    {
+      "id": "F002",
+      "section": 5,
+      "front": "Power factor formula?",
+      "back": "PF = kW / kVA."
+    },
+    {
+      "id": "F003",
+      "section": 5,
+      "front": "Three-phase real power equation?",
+      "back": "kW = √3 × kV × I × PF."
+    },
+    {
+      "id": "F004",
+      "section": 5,
+      "front": "Affinity law for centrifugal fan/pump power?",
+      "back": "Power varies approximately with the cube of speed."
+    },
+    {
+      "id": "F005",
+      "section": 6,
+      "front": "Lumen vs lux?",
+      "back": "Lumen is luminous flux; lux is illuminance (lumens per square metre)."
+    },
+    {
+      "id": "F006",
+      "section": 7,
+      "front": "kW/ton from COP?",
+      "back": "kW/ton = 3.517 / COP."
+    },
+    {
+      "id": "F007",
+      "section": 7,
+      "front": "Water-side heat shortcut?",
+      "back": "q(kW) ≈ L/s × 4.2 × ΔT."
+    },
+    {
+      "id": "F008",
+      "section": 7,
+      "front": "How do you find dew point on a psychrometric chart?",
+      "back": "Move horizontally at constant humidity ratio to the saturation curve."
+    },
+    {
+      "id": "F009",
+      "section": 7,
+      "front": "R and U relationship?",
+      "back": "U = 1 / ΣR."
+    },
+    {
+      "id": "F010",
+      "section": 10,
+      "front": "Boiler input for specified useful output?",
+      "back": "Fuel input = useful output / efficiency."
+    },
+    {
+      "id": "F011",
+      "section": 13,
+      "front": "Preventive vs predictive maintenance?",
+      "back": "Preventive is scheduled; predictive uses condition/performance data."
+    },
+    {
+      "id": "F012",
+      "section": 14,
+      "front": "Basic M&V savings concept?",
+      "back": "Savings = adjusted baseline energy − reporting-period energy."
+    },
+    {
+      "id": "F013",
+      "section": 1,
+      "front": "Scope 1 emissions?",
+      "back": "Direct emissions from sources owned or controlled by the organization."
+    },
+    {
+      "id": "F014",
+      "section": 1,
+      "front": "Scope 2 emissions?",
+      "back": "Indirect emissions associated with purchased electricity, steam, heat or cooling."
+    },
+    {
+      "id": "F015",
+      "section": 8,
+      "front": "What is BACnet?",
+      "back": "A data communication protocol for building automation and control networks."
+    },
+    {
+      "id": "F016",
+      "section": 9,
+      "front": "kW vs kWh in storage?",
+      "back": "kW is charge/discharge power; kWh is stored energy."
+    },
+    {
+      "id": "F017",
+      "section": 11,
+      "front": "CHP overall useful efficiency?",
+      "back": "(Useful electric output + useful thermal output) / fuel input."
+    },
+    {
+      "id": "F018",
+      "section": 12,
+      "front": "Why optimize industrial refrigeration as a system?",
+      "back": "Compressors, condensers, evaporators, controls and operating conditions interact."
+    }
+  ],
+  "schedule": [
+    {
+      "day": 1,
+      "week": 1,
+      "title": "Diagnostic + sustainability overview",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 2,
+      "week": 1,
+      "title": "Codes/standards + GHG",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 3,
+      "week": 1,
+      "title": "Rates/tariffs",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 4,
+      "week": 1,
+      "title": "Point-of-use cost",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 5,
+      "week": 1,
+      "title": "Audits & benchmarking",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 6,
+      "week": 1,
+      "title": "Instrumentation",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 7,
+      "week": 1,
+      "title": "Week 1 review",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 8,
+      "week": 2,
+      "title": "TVM & factor tables",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 9,
+      "week": 2,
+      "title": "NPV/SIR",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 10,
+      "week": 2,
+      "title": "IRR/LCC",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 11,
+      "week": 2,
+      "title": "Payback/depreciation",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 12,
+      "week": 2,
+      "title": "Electrical power triangle",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 13,
+      "week": 2,
+      "title": "Three-phase power",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 14,
+      "week": 2,
+      "title": "Week 2 review",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 15,
+      "week": 3,
+      "title": "Power factor correction",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 16,
+      "week": 3,
+      "title": "Motor efficiency/slip",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 17,
+      "week": 3,
+      "title": "Affinity laws/VFD",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 18,
+      "week": 3,
+      "title": "Power quality concepts",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 19,
+      "week": 3,
+      "title": "Lighting fundamentals",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 20,
+      "week": 3,
+      "title": "Lumen method",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 21,
+      "week": 3,
+      "title": "Week 3 review",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 22,
+      "week": 4,
+      "title": "HVAC cycle & equipment",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 23,
+      "week": 4,
+      "title": "COP/EER/kW-ton",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 24,
+      "week": 4,
+      "title": "Air sensible heat",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 25,
+      "week": 4,
+      "title": "Water heat transfer",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 26,
+      "week": 4,
+      "title": "Chillers/towers/VRF",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 27,
+      "week": 4,
+      "title": "Psychrometric chart basics",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 28,
+      "week": 4,
+      "title": "Psychrometric processes",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 29,
+      "week": 5,
+      "title": "Psychrometric mixed",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 30,
+      "week": 5,
+      "title": "Absorption & heat pumps",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 31,
+      "week": 5,
+      "title": "Air systems/VAV",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 32,
+      "week": 5,
+      "title": "Envelope R/U/k",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 33,
+      "week": 5,
+      "title": "Instantaneous conduction",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 34,
+      "week": 5,
+      "title": "Degree days",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 35,
+      "week": 5,
+      "title": "HVAC section test",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 36,
+      "week": 6,
+      "title": "Controls fundamentals",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 37,
+      "week": 6,
+      "title": "PID/deadband/reset",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 38,
+      "week": 6,
+      "title": "BACnet/DDC",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 39,
+      "week": 6,
+      "title": "AI/IoT/cybersecurity",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 40,
+      "week": 6,
+      "title": "Thermal storage",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 41,
+      "week": 6,
+      "title": "Battery storage",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 42,
+      "week": 6,
+      "title": "Week 6 review",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 43,
+      "week": 7,
+      "title": "Boiler efficiency",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 44,
+      "week": 7,
+      "title": "Boiler improvements",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 45,
+      "week": 7,
+      "title": "Steam tables",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 46,
+      "week": 7,
+      "title": "Steam traps/condensate",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 47,
+      "week": 7,
+      "title": "CHP",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 48,
+      "week": 7,
+      "title": "Renewables",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 49,
+      "week": 7,
+      "title": "Microgrids/B2G/hydrogen",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 50,
+      "week": 8,
+      "title": "Pumps/system curves",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 51,
+      "week": 8,
+      "title": "Compressed air",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 52,
+      "week": 8,
+      "title": "Industrial steam/fans/HX",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 53,
+      "week": 8,
+      "title": "Industrial refrigeration",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 54,
+      "week": 8,
+      "title": "Waste heat",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 55,
+      "week": 8,
+      "title": "Maintenance",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 56,
+      "week": 8,
+      "title": "Commissioning",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 57,
+      "week": 9,
+      "title": "M&V baselines",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 58,
+      "week": 9,
+      "title": "ESPC/financing",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 59,
+      "week": 9,
+      "title": "Weak-area repair",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 60,
+      "week": 9,
+      "title": "HVAC timed sprint",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 61,
+      "week": 9,
+      "title": "Economics/electrical sprint",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 62,
+      "week": 9,
+      "title": "Half mock",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 63,
+      "week": 9,
+      "title": "Half mock review",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 64,
+      "week": 10,
+      "title": "Weak section 1",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 65,
+      "week": 10,
+      "title": "Weak section 2",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 66,
+      "week": 10,
+      "title": "Reference navigation",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 67,
+      "week": 10,
+      "title": "Full mock #1",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 68,
+      "week": 10,
+      "title": "Mock review",
+      "minutes": 75,
+      "done": false
+    },
+    {
+      "day": 69,
+      "week": 10,
+      "title": "Final targeted revision",
+      "minutes": 150,
+      "done": false
+    },
+    {
+      "day": 70,
+      "week": 10,
+      "title": "Full mock #2 / readiness",
+      "minutes": 150,
+      "done": false
+    }
+  ]
+}
