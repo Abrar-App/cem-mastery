@@ -1,53 +1,31 @@
-# CEM Mastery — GitHub Pages PWA
+# CEM Mastery v0.2
 
-This is a free, installable, offline-first CEM study app.
+GitHub Pages-ready private PWA.
 
-## Publish on GitHub Pages
-
-1. Create a new GitHub repository, e.g. `cem-mastery`.
-2. Upload **all files and folders from this package to the repository root**.
-3. Commit the files.
-4. In GitHub: **Settings → Pages → Build and deployment → Deploy from a branch**.
-5. Choose branch `main` and folder `/ (root)`, then Save.
-6. Open the Pages URL shown by GitHub.
-
-### iPhone / iPad
-Open the GitHub Pages URL in Safari → Share → **Add to Home Screen**.
-
-### Laptop
-Open the same URL in a modern browser. Chrome/Edge may also offer an Install option.
-
-## Important current limitation
-This GitHub-only build stores study progress locally on each browser/device. Automatic iPhone ↔ iPad ↔ laptop sync is not included yet because GitHub Pages does not provide a secure personal database.
-
-Backup/export is included so progress is not trapped in the app. The data model is sync-ready for a later cloud layer.
-
-## Included in this build
-- Dashboard and readiness score
-- 14 current CEM sections
-- Initial validated lesson content
-- Theory/Numerical separation
-- Randomized approved starter practice bank
-- Timed question tracking
-- Flashcards with simple spaced repetition
-- 70-day / 10-week study calendar
-- Full/half mock interface
-- Formula/reference search
-- iPad/Apple Pencil-compatible canvas via Pointer Events
-- Local backup/import
+## Included
+- 93 sequential tutor lessons
+- 372 practice questions
+- 186 flashcards
+- iPad / Apple Pencil numerical notebook using Pointer Events
+- Pen, stroke eraser, undo, redo, stroke selection, drag-to-move, duplicate, resize, delete, clear, save/autosave
+- Multi-page notebook with add/delete/duplicate pages
+- Blank/lined/grid backgrounds
+- IndexedDB per-question handwriting persistence
+- Full export/import including handwriting
+- Read-aloud with pause/resume/stop using Web Speech API
+- Offline service worker
 - Dark/light mode
-- Offline service worker cache
-- Read-aloud through browser speech synthesis
+- Basic progress/readiness shell and mock placeholders
 
-## Content QA note
-This is the first app build. The content bank is intentionally smaller than the final planned bank because only verified/approved items should enter scored practice. The repository is structured so validated lessons/questions can be expanded without changing the app engine.
+## Deploy
+Upload every file/folder in this repository to the root of your GitHub Pages repository.
+Your Pages site should serve `index.html` and preserve the `data/` and `icons/` folders.
 
-## Local test
-Service workers require HTTP/HTTPS, not `file://`.
+## iPad
+Open the HTTPS GitHub Pages URL in Safari, Share → Add to Home Screen. For best Apple Pencil behavior, use the installed standalone PWA. The canvas uses Pointer Events and pressure when available. Touch scrolling is disabled inside the writing canvas only.
 
-Example:
-```bash
-python -m http.server 8080
-```
-Then open:
-`http://localhost:8080`
+## Important release note
+The app is development-ready. Final exam-readiness scoring should remain conservative until the expanded fresh-variant/mock bank and final QA release gates are completed.
+
+## Read aloud on iPad
+Lesson read-aloud uses Safari/iOS Web Speech and supports play, pause/resume and stop after a user tap. iOS can suspend browser speech when the PWA is backgrounded or the screen is locked; that limitation is controlled by iOS.

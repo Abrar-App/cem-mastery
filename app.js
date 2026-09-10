@@ -1,230 +1,306 @@
 
-const NAV=[
-["dashboard","⌂","Home"],["learn","◫","Learn"],["practice","?","Practice"],["flashcards","▱","Cards"],
-["calendar","▦","Calendar"],["mocks","◷","Mocks"],["reference","≡","Reference"],["progress","↗","Progress"]
-];
-let DATA=null;
-let state={
- route:"dashboard", lessonFilter:"all", currentQ:null, qStart:0, selected:null, revealed:false,
- progress:{lessons:{},attempts:[],cards:{},schedule:{},settings:{theme:"light"},readiness:0},
- canvas:null
+const App = {
+  lessons:[], questions:[], cards:[], view:'home', currentLesson:null,
+  state:{
+    version:2, completedLessons:[], lessonMastery:{}, attempts:{}, questionIndex:0,
+    cardState:{}, theme:'light', settings:{paper:'grid'}, mockHistory:[]
+  },
+  speech:null, notebook:null
 };
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
-function shuffle(a){let x=[...a];for(let i=x.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x}
-function save(){localStorage.setItem("cemMasteryProgress",JSON.stringify(state.progress))}
-function load(){try{const p=JSON.parse(localStorage.getItem("cemMasteryProgress"));if(p)state.progress={...state.progress,...p}}catch{}}
-function pct(n,d){return d?Math.round(n/d*100):0}
-function lessonDone(){return Object.values(state.progress.lessons).filter(Boolean).length}
-function attempts(){return state.progress.attempts}
-function accuracy(){
- const a=attempts().filter(x=>x.graded);
- return a.length?Math.round(a.filter(x=>x.correct).length/a.length*100):0;
+const $=(s,p=document)=>p.querySelector(s), $$=(s,p=document)=>[...p.querySelectorAll(s)];
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+function save(){localStorage.setItem('cem-mastery-state-v2',JSON.stringify(App.state))}
+function load(){try{Object.assign(App.state,JSON.parse(localStorage.getItem('cem-mastery-state-v2')||'{}'))}catch(e){} document.documentElement.dataset.theme=App.state.theme||'light'}
+async function init(){
+  load();
+  [App.lessons,App.questions,App.cards]=await Promise.all([
+    fetch('./data/lessons.json').then(r=>r.json()),
+    fetch('./data/questions.json').then(r=>r.json()),
+    fetch('./data/flashcards.json').then(r=>r.json())
+  ]);
+  bindShell(); route('home');
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 }
-function timedScore(){
- const a=attempts().filter(x=>x.graded);
- if(!a.length)return 0;
- const ok=a.filter(x=>x.correct && x.elapsed<=x.target*1.25).length;
- return Math.round(ok/a.length*100)
+function bindShell(){
+  $$('.nav-btn').forEach(b=>b.onclick=()=>route(b.dataset.view));
+  $('#themeBtn').onclick=()=>{App.state.theme=App.state.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=App.state.theme;save()};
+  $('#backupBtn').onclick=exportBackup;
+  $('#restoreInput').onchange=e=>restoreBackup(e.target.files[0]);
 }
-function readiness(){
- const coverage=pct(lessonDone(),DATA.lessons.length);
- const acc=accuracy(), timed=timedScore();
- const cardStates=Object.values(state.progress.cards); const retention=cardStates.length?Math.round(cardStates.filter(x=>x.box>=2).length/cardStates.length*100):0;
- return Math.round(coverage*.25+acc*.35+timed*.25+retention*.15);
+function route(v){
+  stopSpeech(); App.view=v;
+  $$('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
+  const render={home:renderHome,course:renderCourse,practice:renderPracticeHub,flashcards:renderFlashcards,mocks:renderMocks,progress:renderProgress}[v]||renderHome;
+  render(); window.scrollTo({top:0,behavior:'instant'});
 }
-function sectionMastery(id){
- const qs=attempts().filter(a=>a.section===id && a.graded);
- if(!qs.length)return 0;
- return Math.round(qs.filter(a=>a.correct).length/qs.length*100);
+function nextLesson(){return App.lessons.find(l=>!App.state.completedLessons.includes(l.lesson))||App.lessons.at(-1)}
+function progressPct(){return Math.round(App.state.completedLessons.length/App.lessons.length*100)}
+function renderHome(){
+  const l=nextLesson(), due=dueCards().length, mistakes=Object.values(App.state.attempts).filter(a=>a.correct===false||a.notSure).length;
+  $('#view').innerHTML=`<section class="hero">
+    <div class="card"><div class="eyebrow">Continue your course</div><h1>Lesson ${l.lesson}: ${esc(l.title)}</h1><p class="muted">${esc(l.outcome)}</p>
+      <div class="row"><button class="primary" id="startLesson">Start / Continue Lesson</button><button class="secondary" id="quickPractice">Practice numericals</button></div>
+    </div>
+    <div class="card metric"><span>Course progress</span><strong>${progressPct()}%</strong><div class="progressbar"><i style="width:${progressPct()}%"></i></div><p class="muted">${App.state.completedLessons.length} of ${App.lessons.length} lessons completed</p></div>
+  </section>
+  <section class="grid3">
+    <div class="card metric"><span>Due flashcards</span><strong>${due}</strong><button class="ghost" data-go="flashcards">Review</button></div>
+    <div class="card metric"><span>Mistakes / Not Sure</span><strong>${mistakes}</strong><button class="ghost" id="reviewMistakes">Review</button></div>
+    <div class="card metric"><span>Readiness</span><strong>${readiness()}%</strong><small class="muted">Adaptive estimate; mock gates still required</small></div>
+  </section>`;
+  $('#startLesson').onclick=()=>openLesson(l.lesson);
+  $('#quickPractice').onclick=()=>{App.state.questionIndex=0;route('practice')};
+  $$('[data-go]').forEach(x=>x.onclick=()=>route(x.dataset.go));
+  $('#reviewMistakes').onclick=()=>route('practice');
 }
-function setRoute(r){state.route=r;state.currentQ=null;state.selected=null;state.revealed=false;render()}
-function nav(){
- const html=NAV.map(([r,i,l])=>`<button class="navbtn ${state.route===r?'active':''}" data-route="${r}"><span>${i}</span><span>${l}</span></button>`).join("");
- $("#nav").innerHTML=html; $("#mobileNav").innerHTML=html;
- $$("[data-route]").forEach(b=>b.onclick=()=>setRoute(b.dataset.route));
+function renderCourse(){
+  $('#view').innerHTML=`<div class="card"><div class="eyebrow">Sequential course map</div><h1>93 one-hour lessons</h1><p class="muted">Normal study flow is sequential. You do not need to choose the topic yourself.</p></div>
+  <div class="lesson-list" style="margin-top:12px">${App.lessons.map(l=>`<div class="lesson-item ${App.state.completedLessons.includes(l.lesson)?'done':''}">
+    <div class="lesson-no">${l.lesson}</div><div><strong>${esc(l.title)}</strong><div class="muted">Section ${esc(l.section)} · ${esc(l.mode)}</div></div>
+    <button class="ghost" data-lesson="${l.lesson}">${App.state.completedLessons.includes(l.lesson)?'Review':'Open'}</button></div>`).join('')}</div>`;
+  $$('[data-lesson]').forEach(b=>b.onclick=()=>openLesson(+b.dataset.lesson));
 }
-function title(t,s=""){ $("#pageTitle").textContent=t; $("#subTitle").textContent=s; }
-function render(){nav();document.documentElement.dataset.theme=state.progress.settings.theme||"light";
- const fn={dashboard,learn,practice,flashcards,calendar,mocks,reference,progress}[state.route]||dashboard;fn();}
-function dashboard(){
- title("Dashboard","Your adaptive CEM study plan");
- const cov=pct(lessonDone(),DATA.lessons.length), rd=readiness(), acc=accuracy(), ts=timedScore();
- const next=DATA.schedule.find(x=>!state.progress.schedule[x.day]);
- const secRows=DATA.sections.map(s=>`<div class="row"><div class="row-main"><strong>${s.id}. ${esc(s.name)}</strong><small>Official weight ${s.weight}</small></div><div><span class="badge">${sectionMastery(s.id)}% mastery</span></div></div>`).join("");
- $("#view").innerHTML=`
- <div class="grid cols-4">
-  <div class="card"><div class="muted">Course coverage</div><div class="metric">${cov}%</div><div class="progress"><span style="width:${cov}%"></span></div></div>
-  <div class="card"><div class="muted">Exam readiness</div><div class="metric">${rd}%</div><div class="progress"><span style="width:${rd}%"></span></div></div>
-  <div class="card"><div class="muted">Question accuracy</div><div class="metric">${acc}%</div><small>${attempts().filter(x=>x.graded).length} attempts</small></div>
-  <div class="card"><div class="muted">Timed performance</div><div class="metric">${ts}%</div><small>Correct within target</small></div>
- </div>
- <div class="grid cols-2" style="margin-top:16px">
-  <div class="card"><h2>Today's target</h2>${next?`<span class="pill">Week ${next.week} • ${next.minutes} min</span><h3>${esc(next.title)}</h3><p class="muted">Complete today's planned study. If unfinished, the task remains available rather than disappearing.</p><button class="btn primary" id="todayBtn">Open Calendar</button>`:`<h3>Plan complete</h3><p>Use mocks and weak-area practice.</p>`}</div>
-  <div class="card"><h2>Readiness advice</h2>${advice(rd,cov,acc,ts)}</div>
- </div>
- <div class="card" style="margin-top:16px"><h2>Section mastery</h2><div class="section-list">${secRows}</div></div>`;
- if($("#todayBtn"))$("#todayBtn").onclick=()=>setRoute("calendar");
-}
-function advice(rd,cov,acc,ts){
- if(cov<40)return `<p>Prioritize learning coverage. Keep numerical practice active while completing the foundations.</p>`;
- if(acc<70)return `<p>Your question accuracy is below the readiness target. Rework incorrect concepts before adding more mock volume.</p>`;
- if(ts<70)return `<p>Knowledge is improving, but pacing needs work. Add 10-question timed sprints.</p>`;
- if(rd>=80)return `<p><strong>Good trajectory.</strong> Shift more study time toward mixed timed work and full-reference navigation.</p>`;
- return `<p>Continue the scheduled plan. Do not book the exam based on completion alone; readiness must also include accuracy and speed.</p>`;
-}
-function learn(){
- title("Learn","Theory and numerical lessons");
- const filters=["all","Theory","Both"];
- const tabs=filters.map(x=>`<button class="tab ${state.lessonFilter===x?'active':''}" data-filter="${x}">${x==="all"?"All":x==="Both"?"Numerical / Both":x}</button>`).join("");
- const grouped=DATA.sections.map(s=>{
-  const ls=DATA.lessons.filter(l=>l.section===s.id && (state.lessonFilter==="all"||l.type===state.lessonFilter));
-  if(!ls.length)return "";
-  return `<div class="card"><div class="row"><div><h3 style="margin:0">${s.id}. ${esc(s.name)}</h3><small class="muted">Weight ${s.weight}</small></div></div>
-   ${ls.map(l=>`<div class="row"><div class="row-main"><strong>${esc(l.title)}</strong><small>${l.type} • ${l.minutes} min</small></div><button class="btn ${state.progress.lessons[l.id]?'good':''}" data-lesson="${l.id}">${state.progress.lessons[l.id]?'Review':'Open'}</button></div>`).join("")}</div>`;
- }).join("");
- $("#view").innerHTML=`<div class="tabs">${tabs}</div><div class="grid">${grouped}</div>`;
- $$("[data-filter]").forEach(b=>b.onclick=()=>{state.lessonFilter=b.dataset.filter;learn()});
- $$("[data-lesson]").forEach(b=>b.onclick=()=>lessonView(b.dataset.lesson));
-}
-function lessonView(id){
- const l=DATA.lessons.find(x=>x.id===id); if(!l)return;
- title(l.title,`Section ${l.section} • ${l.type} • ${l.minutes} min`);
- $("#view").innerHTML=`<div class="card lesson">
- <button class="btn" id="backLearn">← Lessons</button>
- <h2>${esc(l.title)}</h2><span class="pill">${l.type}</span>
- <p>${esc(l.simple)}</p>
- ${l.detail?`<div class="callout"><strong>Engineer Detail</strong><p>${esc(l.detail)}</p></div>`:""}
- ${l.formula?`<div class="formula">${esc(l.formula)}</div>`:""}
- ${l.trap?`<div class="callout"><strong>Exam trap</strong><p>${esc(l.trap)}</p></div>`:""}
- <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
-  <button class="btn" id="readBtn">🔊 Read aloud</button>
-  <button class="btn primary" id="completeBtn">${state.progress.lessons[id]?'Completed ✓':'Mark complete'}</button>
-  ${l.type==="Both"?`<button class="btn" id="workspaceBtn">✎ Numerical workspace</button>`:""}
- </div></div>`;
- $("#backLearn").onclick=learn;
- $("#readBtn").onclick=()=>{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance([l.title,l.simple,l.detail||"",l.formula||"",l.trap||""].join(". ")))};
- $("#completeBtn").onclick=()=>{state.progress.lessons[id]=true;save();lessonView(id)};
- if($("#workspaceBtn"))$("#workspaceBtn").onclick=()=>workspace(l);
-}
-function practice(){
- title("Practice","Randomized from approved starter bank");
- if(!state.currentQ)state.currentQ=shuffle(DATA.questions)[0];
- const q=state.currentQ;
- $("#view").innerHTML=`<div class="card question-card">
-  <div class="row"><div><span class="pill">Section ${q.section}</span> <span class="badge">${q.type} • ${q.difficulty}</span></div><div class="muted" id="timer">0s / ${q.target}s</div></div>
-  <div class="qtext">${esc(q.q)}</div>
-  <div>${q.options.map((o,i)=>`<button class="option ${state.selected===i?'selected':''}" data-opt="${i}">${String.fromCharCode(65+i)}. ${esc(o)}</button>`).join("")}</div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-   <button class="btn" id="notSure">Not Sure</button>
-   <button class="btn primary" id="submitQ">Submit</button>
-   ${q.type==="Numerical"?`<button class="btn" id="scratchQ">✎ Workspace</button>`:""}
+function openLesson(n){
+  App.currentLesson=n; const l=App.lessons.find(x=>x.lesson===n);
+  $('#view').innerHTML=`<div class="card">
+    <div class="lesson-head"><div><div class="eyebrow">Lesson ${l.lesson} · Section ${esc(l.section)}</div><h1>${esc(l.title)}</h1><p class="muted">${esc(l.outcome)}</p></div>
+      <div class="reader"><button class="secondary" id="readBtn">🔊 Read aloud</button><button class="ghost" id="pauseBtn">Pause</button><button class="ghost" id="stopBtn">Stop</button></div>
+    </div>
   </div>
-  ${state.revealed?solutionHtml(q):""}
- </div>`;
- if(!state.qStart){state.qStart=Date.now();timerTick()}
- $$("[data-opt]").forEach(b=>b.onclick=()=>{if(state.revealed)return;state.selected=+b.dataset.opt;practice()});
- $("#notSure").onclick=()=>{if(!state.revealed)submitQ(true)};
- $("#submitQ").onclick=()=>{if(state.selected===null)return alert("Select an answer or tap Not Sure.");submitQ(false)};
- if($("#scratchQ"))$("#scratchQ").onclick=()=>workspace(q);
- if(state.revealed)$("#nextQ").onclick=()=>{state.currentQ=shuffle(DATA.questions.filter(x=>x.id!==q.id))[0];state.selected=null;state.revealed=false;state.qStart=0;practice()};
+  <section class="grid2" style="margin-top:12px">
+    <div class="card"><h2>First-principles teaching</h2>${l.teaching_points.map(p=>`<p class="teach-point">${esc(p)}</p>`).join('')}
+      <details><summary><strong>Engineer Detail</strong></summary><p class="muted">When studying, connect each statement to the physical system, assumptions, units and likely exam distractors. Use the Reference area and question explanations for deeper technical checks.</p></details>
+    </div>
+    <div class="card"><h2>Worked example / scenario</h2><div class="worked">${esc(l.worked_example)}</div><h3>Guided practice</h3>${l.guided_practice.map((p,i)=>`<p><strong>${i+1}.</strong> ${esc(p)}</p>`).join('')}</div>
+  </section>
+  <section class="card" style="margin-top:12px"><div class="row space"><div><h2>Mastery</h2><p class="muted">Complete practice without excessive help before marking this lesson mastered.</p></div>
+    <div class="row"><button class="secondary" id="lessonPractice">Practice Lesson</button><button class="primary" id="completeLesson">Mark lesson complete</button></div></div></section>`;
+  $('#readBtn').onclick=()=>readLesson(l);
+  $('#pauseBtn').onclick=togglePauseSpeech; $('#stopBtn').onclick=stopSpeech;
+  $('#lessonPractice').onclick=()=>{App.state.practiceLesson=n;App.state.questionIndex=0;route('practice')};
+  $('#completeLesson').onclick=()=>{if(!App.state.completedLessons.includes(n))App.state.completedLessons.push(n);save();toast('Lesson completed');renderCourse()};
+  window.scrollTo(0,0);
 }
-function solutionHtml(q){
- const ok=state.selected===q.answer;
- return `<div class="explain"><h3>${ok?'Correct ✓':'Review this concept'}</h3><p><strong>Answer:</strong> ${String.fromCharCode(65+q.answer)}. ${esc(q.options[q.answer])}</p><p>${esc(q.solution)}</p><p><strong>Common trap:</strong> ${esc(q.trap)}</p><button class="btn primary" id="nextQ">Next random question</button></div>`;
+function readLesson(l){
+  if(!('speechSynthesis' in window)){toast('Read aloud is not supported by this browser');return}
+  stopSpeech();
+  const text=[`Lesson ${l.lesson}. ${l.title}.`,l.outcome,...l.teaching_points,`Worked example. ${l.worked_example}`].join(' ');
+  const u=new SpeechSynthesisUtterance(text);u.rate=.95;u.pitch=1;
+  App.speech=u;speechSynthesis.speak(u);
 }
-function submitQ(notSure){
- const q=state.currentQ, elapsed=Math.round((Date.now()-state.qStart)/1000), correct=state.selected===q.answer;
- state.progress.attempts.push({id:crypto.randomUUID?.()||String(Date.now()),question:q.id,section:q.section,correct,notSure,elapsed,target:q.target,graded:true,date:new Date().toISOString()});
- state.revealed=true;save();practice();
+function togglePauseSpeech(){if(!('speechSynthesis' in window))return;if(speechSynthesis.paused)speechSynthesis.resume();else speechSynthesis.pause()}
+function stopSpeech(){if('speechSynthesis' in window)speechSynthesis.cancel();App.speech=null}
+function practiceSet(){
+  const numerical=App.questions.filter(q=>/Numerical/i.test(q.type));
+  if(App.state.practiceLesson) return App.questions.filter(q=>q.lesson===App.state.practiceLesson);
+  return numerical;
 }
-let timerInt=null;
-function timerTick(){clearInterval(timerInt);timerInt=setInterval(()=>{if(state.route!=="practice"||!state.qStart){clearInterval(timerInt);return}const e=Math.round((Date.now()-state.qStart)/1000);if($("#timer"))$("#timer").textContent=`${e}s / ${state.currentQ.target}s`},1000)}
-function flashcards(){
- title("Flashcards","Fast revision with spaced boxes");
- const due=DATA.flashcards.filter(c=>!state.progress.cards[c.id]||state.progress.cards[c.id].due<=Date.now());
- const c=due[0]||DATA.flashcards[0];
- state.cardFlip=state.cardFlip||false;
- $("#view").innerHTML=`<div class="card flashcard" id="cardFlip"><div>${state.cardFlip?`<div class="back">${esc(c.back)}</div>`:`<strong>${esc(c.front)}</strong><p class="muted">Tap card to reveal</p>`}</div></div>
- <div style="display:flex;justify-content:center;gap:8px;margin-top:14px"><button class="btn" data-cardrate="1">Again</button><button class="btn" data-cardrate="2">Hard</button><button class="btn good" data-cardrate="3">Got it</button></div>
- <p class="muted" style="text-align:center">${due.length} cards due now</p>`;
- $("#cardFlip").onclick=()=>{state.cardFlip=!state.cardFlip;flashcards()};
- $$("[data-cardrate]").forEach(b=>b.onclick=()=>{const r=+b.dataset.cardrate;const old=state.progress.cards[c.id]||{box:0};let box=r===1?0:Math.min(5,(old.box||0)+1);let days=[0,1,3,7,14,30][box];state.progress.cards[c.id]={box,due:Date.now()+days*86400000};state.cardFlip=false;save();flashcards()});
+function renderPracticeHub(){
+  const set=practiceSet(); if(!set.length){$('#view').innerHTML='<div class="card">No practice found.</div>';return}
+  App.state.questionIndex=Math.min(App.state.questionIndex||0,set.length-1);
+  const q=set[App.state.questionIndex];
+  $('#view').innerHTML=`<div class="practice-layout">
+   <section class="card question-card">
+    <div class="row space"><span class="pill">Lesson ${q.lesson}</span><span class="muted">${App.state.questionIndex+1}/${set.length}</span></div>
+    <h2>${esc(q.title)}</h2><p class="question">${esc(q.question)}</p>
+    <div class="options">${q.options.map(o=>`<button class="option" data-opt="${o.key}"><strong>${o.key})</strong> ${esc(o.text)}</button>`).join('')}</div>
+    <label class="row"><input id="notSure" type="checkbox"> <strong>Not Sure</strong> — review this even if correct</label>
+    <div class="row" style="margin-top:12px"><button class="primary" id="submitQ">Check answer</button><button class="ghost" id="prevQ">← Previous</button><button class="ghost" id="nextQ">Next →</button></div>
+    <div id="result"></div>
+    <h3 style="margin-top:18px">Tutor help</h3>
+    <div class="row">
+      ${[['Hint','hint1'],['Method','hint2'],['Formula','formula'],['Setup','setup'],['Calculator','calculator'],['Solution','explanation']].map(([a,b])=>`<button class="secondary help" data-field="${b}">${a}</button>`).join('')}
+    </div><div id="helpOut"></div>
+   </section>
+   <section class="notebook-wrap"><div class="notebook-toolbar">
+    <button class="tool active" data-tool="pen">✎ Pen</button><button class="tool" data-tool="eraser">⌫ Eraser</button><button class="tool" data-tool="select">▱ Select</button>
+    <button class="tool" id="copySel" title="Duplicate selected strokes">⧉ Copy</button>
+    <button class="tool" id="growSel" title="Enlarge selected strokes">＋ Size</button>
+    <button class="tool" id="shrinkSel" title="Shrink selected strokes">− Size</button>
+    <button class="tool" id="deleteSel" title="Delete selected strokes">Delete Sel.</button>
+    <span class="tool-sep"></span><button class="tool" id="undo">↶ Undo</button><button class="tool" id="redo">↷ Redo</button>
+    <button class="tool" id="saveInk">Save</button><button class="tool" id="clearInk">Clear</button>
+    <select class="tool" id="paper"><option value="grid">Grid</option><option value="lined">Lined</option><option value="blank">Blank</option></select>
+   </div><div class="notebook-canvas-wrap ${App.state.settings.paper||'grid'}" id="canvasWrap">
+     <canvas class="notebook-canvas" id="inkCanvas"></canvas><div class="selection-box" id="selectionBox"></div>
+   </div><div class="pagebar"><button class="tool" id="prevPage">←</button><span id="pageLabel">1 / 1</span><button class="tool" id="nextPage">→</button><button class="tool" id="addPage">＋ Page</button><button class="tool" id="dupPage">Duplicate</button><button class="tool" id="delPage">Delete</button></div></section>
+  </div>`;
+  let selected=null, helpLevel=0;
+  $$('.option').forEach(b=>b.onclick=()=>{$$('.option').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');selected=b.dataset.opt});
+  $$('.help').forEach((b,i)=>b.onclick=()=>{helpLevel=Math.max(helpLevel,i+1);const v=q[b.dataset.field]||'No additional help is needed for this item.';$('#helpOut').innerHTML=`<div class="helpbox">${esc(v)}</div>`});
+  $('#submitQ').onclick=()=>{
+    if(!selected){toast('Choose an answer first');return}
+    const correct=selected===q.answer, notSure=$('#notSure').checked;
+    $$('.option').forEach(x=>{if(x.dataset.opt===q.answer)x.classList.add('correct');else if(x.dataset.opt===selected)x.classList.add('wrong')});
+    App.state.attempts[q.id]={correct,answer:selected,notSure,helpLevel,time:Date.now(),lesson:q.lesson};
+    save();
+    $('#result').innerHTML=`<div class="answerbox"><strong>${correct?'Correct':'Not correct'}${notSure?' · marked Not Sure':''}</strong><p>${esc(q.explanation)}</p></div>`;
+  };
+  $('#prevQ').onclick=()=>{App.state.questionIndex=Math.max(0,App.state.questionIndex-1);save();renderPracticeHub()};
+  $('#nextQ').onclick=()=>{App.state.questionIndex=Math.min(set.length-1,App.state.questionIndex+1);save();renderPracticeHub()};
+  initNotebook(q.id);
 }
-function calendar(){
- title("Calendar","10-week adaptive study plan");
- const days=DATA.schedule.map(d=>`<div class="day ${state.progress.schedule[d.day]?'done':''}"><strong>Day ${d.day}</strong><small>Week ${d.week} • ${d.minutes} min</small><p>${esc(d.title)}</p><button class="btn ${state.progress.schedule[d.day]?'good':''}" data-day="${d.day}">${state.progress.schedule[d.day]?'Done ✓':'Complete'}</button></div>`).join("");
- $("#view").innerHTML=`<div class="card"><p><strong>Default:</strong> 75 min weekdays, 150 min Saturday/Sunday. Missed items remain incomplete and can be redistributed later.</p></div><div class="calendar" style="margin-top:14px">${days}</div>`;
- $$("[data-day]").forEach(b=>b.onclick=()=>{let id=+b.dataset.day;state.progress.schedule[id]=!state.progress.schedule[id];save();calendar()});
+function dueCards(){
+  const now=Date.now(); return App.cards.filter(c=>{const s=App.state.cardState[c.id];return !s||!s.due||s.due<=now});
 }
-function mocks(){
- title("Mock Tests","Exam conditioning");
- const modes=[
-  ["Quick quiz",10,null],["Section practice",20,null],["Half mock",65,120],["Full mock",130,240]
- ];
- $("#view").innerHTML=`<div class="grid cols-2">${modes.map(([n,c,t])=>`<div class="card"><h2>${n}</h2><div class="metric">${c}<small> questions</small></div><p>${t?`${t} minute timer.`:"Untimed or target-time practice."}</p><button class="btn primary" data-mock="${c}">Start</button></div>`).join("")}</div>
- <div class="card" style="margin-top:16px"><h3>Full mock pace checkpoints</h3><p>Q33 ≈ 61 min • Q65 = 120 min • Q98 ≈ 181 min • Q120 ≈ 222 min • Q130 = 240 min</p><p class="muted">This starter build reuses approved questions if the selected mock exceeds the current validated bank size. Expand the approved bank before treating the 130-question mode as a true readiness simulation.</p></div>`;
- $$("[data-mock]").forEach(b=>b.onclick=()=>startMock(+b.dataset.mock));
+function renderFlashcards(){
+  const cards=dueCards().length?dueCards():App.cards; if(!cards.length)return;
+  let idx=Math.min(App.state.cardIndex||0,cards.length-1), flipped=false;
+  function draw(){
+    const c=cards[idx], st=App.state.cardState[c.id]||{};
+    $('#view').innerHTML=`<div class="flash-shell">
+      <div class="card"><div class="row space"><div><div class="eyebrow">Flashcards · ${esc(c.type)}</div><h2>${esc(c.lessonTitle)}</h2></div><span class="pill">${idx+1}/${cards.length}</span></div></div>
+      <div class="card flashcard" id="flash" style="margin-top:12px"><div><small>${flipped?'ANSWER':'QUESTION'} · Lesson ${c.lesson}</small>${esc(flipped?c.back:c.front)}</div></div>
+      <div class="row space" style="margin-top:10px"><button class="ghost" id="prevCard">← Previous</button><button class="primary" id="flipCard">Flip card</button><button class="ghost" id="nextCard">Next →</button></div>
+      <div class="ratings" style="margin-top:10px"><button data-rate="Again">Again</button><button data-rate="Hard">Hard</button><button data-rate="Good">Good</button><button data-rate="Easy">Easy</button></div>
+    </div>`;
+    $('#flash').onclick=$('#flipCard').onclick=()=>{flipped=!flipped;draw()};
+    $('#prevCard').onclick=()=>{idx=(idx-1+cards.length)%cards.length;flipped=false;App.state.cardIndex=idx;save();draw()};
+    $('#nextCard').onclick=()=>{idx=(idx+1)%cards.length;flipped=false;App.state.cardIndex=idx;save();draw()};
+    $$('[data-rate]').forEach(b=>b.onclick=()=>rateCard(c.id,b.dataset.rate));
+  }
+  function rateCard(id,r){
+    const old=App.state.cardState[id]||{interval:0,ease:2.5};
+    let days=r==='Again'?1:r==='Hard'?Math.max(2,old.interval*1.4||2):r==='Good'?Math.max(3,old.interval*2.2||3):Math.max(5,old.interval*3.2||5);
+    App.state.cardState[id]={interval:days,last:r,due:Date.now()+days*86400000,ease:old.ease};
+    save(); idx=(idx+1)%cards.length;flipped=false;draw();
+  }
+  draw();
 }
-function startMock(count){
- const pool=shuffle(DATA.questions);
- const qs=Array.from({length:count},(_,i)=>pool[i%pool.length]);
- state.mock={qs,index:0,answers:[],start:Date.now(),limit:count===130?14400000:count===65?7200000:null};
- renderMock();
+function renderMocks(){
+  $('#view').innerHTML=`<div class="card"><div class="eyebrow">Exam conditioning</div><h1>Mocks</h1><p class="muted">Use these after enough content is mastered. Full mocks use 130 questions / 4 hours; the current base bank will be expanded with fresh variants before final readiness scoring.</p></div>
+  <div class="grid3" style="margin-top:12px">
+    <div class="mock-option"><strong>20</strong><p>Mixed quick mock</p><button class="primary" onclick="startMock(20)">Start</button></div>
+    <div class="mock-option"><strong>65</strong><p>Half mock · target 2 hours</p><button class="primary" onclick="startMock(65)">Start</button></div>
+    <div class="mock-option"><strong>130</strong><p>Full mock · target 4 hours</p><button class="primary" onclick="startMock(130)">Start</button></div>
+  </div>`;
 }
-function renderMock(){
- const m=state.mock,q=m.qs[m.index],elapsed=Math.round((Date.now()-m.start)/1000);
- title(`Mock ${m.index+1}/${m.qs.length}`,m.limit?`${Math.floor((m.limit/1000-elapsed)/60)} min remaining`:"Untimed");
- $("#view").innerHTML=`<div class="card question-card"><div class="qtext">${esc(q.q)}</div>${q.options.map((o,i)=>`<button class="option" data-mo="${i}">${String.fromCharCode(65+i)}. ${esc(o)}</button>`).join("")}<button class="btn" id="flagMock">Flag / Skip</button></div>`;
- $$("[data-mo]").forEach(b=>b.onclick=()=>{m.answers.push({q:q.id,a:+b.dataset.mo,correct:+b.dataset.mo===q.answer,section:q.section});m.index++;m.index>=m.qs.length?finishMock():renderMock()});
- $("#flagMock").onclick=()=>{m.answers.push({q:q.id,a:null,correct:false,section:q.section,flagged:true});m.index++;m.index>=m.qs.length?finishMock():renderMock()};
+function startMock(n){toast(`Mock engine shell ready for ${n} questions; fresh-variant release gate remains active.`)}
+function readiness(){
+  const coverage=progressPct();
+  const attempts=Object.values(App.state.attempts), acc=attempts.length?attempts.filter(a=>a.correct&&!a.notSure&&a.helpLevel<=2).length/attempts.length*100:0;
+  const cardsSeen=Object.keys(App.state.cardState).length, ret=Math.min(100,cardsSeen/Math.max(1,App.cards.length)*100);
+  return Math.round(.35*coverage+.45*acc+.20*ret);
 }
-function finishMock(){
- const m=state.mock,score=pct(m.answers.filter(x=>x.correct).length,m.answers.length);
- state.progress.attempts.push(...m.answers.map(x=>({id:crypto.randomUUID?.()||String(Date.now()+Math.random()),question:x.q,section:x.section,correct:x.correct,notSure:false,elapsed:0,target:9999,graded:true,mock:true,date:new Date().toISOString()})));
- save();title("Mock Result");$("#view").innerHTML=`<div class="card"><div class="metric">${score}%</div><h2>Mock complete</h2><p>${score>=80?"Strong result. Review every wrong or flagged question.":"Use the result to target weak sections before the next mock."}</p><button class="btn primary" id="mockHome">Back to mocks</button></div>`;$("#mockHome").onclick=()=>{state.mock=null;mocks()}
+function renderProgress(){
+  const attempts=Object.values(App.state.attempts), correct=attempts.filter(a=>a.correct).length, uncertain=attempts.filter(a=>a.notSure).length;
+  $('#view').innerHTML=`<div class="card"><div class="eyebrow">Adaptive progress</div><h1>Readiness ${readiness()}%</h1><p class="muted">This is a study estimate, not a guaranteed exam result. Full-mock gates must be met before an exam-ready recommendation.</p></div>
+  <div class="grid3" style="margin-top:12px">
+   <div class="card metric"><span>Lessons complete</span><strong>${App.state.completedLessons.length}/93</strong></div>
+   <div class="card metric"><span>Practice accuracy</span><strong>${attempts.length?Math.round(correct/attempts.length*100):0}%</strong><span>${attempts.length} attempts</span></div>
+   <div class="card metric"><span>Not Sure</span><strong>${uncertain}</strong><span>These remain review items</span></div>
+  </div><div class="card" style="margin-top:12px"><h2>Data portability</h2><p>Full backup includes progress, attempts, flashcard schedule, settings and all handwritten notebook pages stored in this browser.</p><button class="primary" onclick="exportBackup()">Export full backup</button></div>`;
 }
-function reference(){
- title("Reference","Formula and concept quick lookup");
- const refs=DATA.lessons.filter(l=>l.formula).map(l=>({section:l.section,title:l.title,formula:l.formula,trap:l.trap}));
- $("#view").innerHTML=`<input id="refSearch" class="ref-search" placeholder="Search COP, power factor, degree days, NPV..."><div id="refs">${refs.map(r=>refCard(r)).join("")}</div>`;
- $("#refSearch").oninput=e=>{$("#refs").innerHTML=refs.filter(r=>(r.title+" "+r.formula).toLowerCase().includes(e.target.value.toLowerCase())).map(refCard).join("")}
+async function exportBackup(){
+  const ink=await InkDB.exportAll();
+  const pack={schema:'cem-mastery-backup-v2',exportedAt:new Date().toISOString(),state:App.state,ink};
+  const blob=new Blob([JSON.stringify(pack)],{type:'application/json'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=`CEM_Mastery_Backup_${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href);toast('Full backup exported');
 }
-function refCard(r){return `<div class="card" style="margin-bottom:10px"><span class="pill">Section ${r.section}</span><h3>${esc(r.title)}</h3><div class="formula">${esc(r.formula)}</div>${r.trap?`<p class="muted">${esc(r.trap)}</p>`:""}</div>`}
-function progress(){
- title("Progress","Mastery, timing and weak areas");
- const by=DATA.sections.map(s=>({s,n:sectionMastery(s.id)})).sort((a,b)=>a.n-b.n);
- $("#view").innerHTML=`<div class="grid cols-3"><div class="card"><div class="metric">${readiness()}%</div><div class="muted">Readiness</div></div><div class="card"><div class="metric">${accuracy()}%</div><div class="muted">Accuracy</div></div><div class="card"><div class="metric">${timedScore()}%</div><div class="muted">Timed</div></div></div>
- <div class="card" style="margin-top:16px"><h2>Weakest sections first</h2>${by.map(x=>`<div class="row"><div class="row-main"><strong>${x.s.id}. ${esc(x.s.name)}</strong></div><div style="width:180px"><div class="kpi"><span>${x.n}%</span></div><div class="errorbar"><span style="width:${x.n}%"></span></div></div></div>`).join("")}</div>
- <div class="card" style="margin-top:16px"><h2>Data</h2><button class="btn" id="export2">Export backup</button> <button class="btn" id="import2">Import backup</button> <button class="btn warn" id="resetAll">Reset local progress</button></div>`;
- $("#export2").onclick=exportBackup;$("#import2").onclick=()=>$("#importFile").click();$("#resetAll").onclick=()=>{if(confirm("Reset all local study progress on this device?")){localStorage.removeItem("cemMasteryProgress");location.reload()}};
+async function restoreBackup(file){
+  if(!file)return; try{
+    const pack=JSON.parse(await file.text()); if(!pack.state)throw new Error('Invalid backup');
+    App.state=pack.state;save();await InkDB.importAll(pack.ink||{});document.documentElement.dataset.theme=App.state.theme||'light';toast('Backup restored');route('home');
+  }catch(e){toast('Could not restore backup')}
 }
-function workspace(subject){
- title("Numerical Workspace",subject.title||subject.q||"Scratch space");
- $("#view").innerHTML=`<div class="canvas-wrap">
-  <div class="card"><h3>${esc(subject.title||"Practice question")}</h3><p>${esc(subject.simple||subject.q||"Use this space for your working.")}</p>${subject.formula?`<div class="formula">${esc(subject.formula)}</div>`:""}<p class="muted">Your strokes are saved locally on this device. Automatic math recognition is intentionally not used for grading in this build.</p><button class="btn" id="backWS">← Back</button></div>
-  <div class="card"><div class="canvas-tools"><button class="btn" data-tool="pen">Pen</button><button class="btn" data-tool="eraser">Eraser</button><button class="btn" id="undoInk">Undo</button><button class="btn warn" id="clearInk">Clear</button></div><canvas id="ink"></canvas></div>
- </div>`;
- $("#backWS").onclick=()=>state.route==="practice"?practice():learn();
- initCanvas(subject.id||subject.title||subject.q);
+
+/* ---------- IndexedDB ink store ---------- */
+const InkDB={
+ db:null,
+ open(){return new Promise((res,rej)=>{if(this.db)return res(this.db);const r=indexedDB.open('cem-mastery-ink',1);r.onupgradeneeded=()=>r.result.createObjectStore('ink');r.onsuccess=()=>{this.db=r.result;res(this.db)};r.onerror=()=>rej(r.error)})},
+ async get(k){const d=await this.open();return new Promise(res=>{const r=d.transaction('ink').objectStore('ink').get(k);r.onsuccess=()=>res(r.result);r.onerror=()=>res(null)})},
+ async put(k,v){const d=await this.open();return new Promise(res=>{const t=d.transaction('ink','readwrite');t.objectStore('ink').put(v,k);t.oncomplete=()=>res()})},
+ async exportAll(){const d=await this.open();return new Promise(res=>{const out={};const r=d.transaction('ink').objectStore('ink').openCursor();r.onsuccess=()=>{const c=r.result;if(c){out[c.key]=c.value;c.continue()}else res(out)}})},
+ async importAll(obj){const d=await this.open();return new Promise(res=>{const t=d.transaction('ink','readwrite'),s=t.objectStore('ink');Object.entries(obj).forEach(([k,v])=>s.put(v,k));t.oncomplete=()=>res()})}
+};
+
+/* ---------- Apple Pencil / pointer notebook ---------- */
+async function initNotebook(qid){
+ const canvas=$('#inkCanvas'),wrap=$('#canvasWrap'),box=$('#selectionBox'),ctx=canvas.getContext('2d');
+ let model=await InkDB.get(qid)||{pages:[{bg:App.state.settings.paper||'grid',strokes:[]}],page:0,undo:[],redo:[]};
+ let tool='pen',drawing=false,current=null,selStart=null,selected=[],dragStart=null,movingSelection=false,penActive=false;
+ function resize(){const r=wrap.getBoundingClientRect(),dpr=Math.min(3,window.devicePixelRatio||1);canvas.width=Math.round(r.width*dpr);canvas.height=Math.round(r.height*dpr);canvas.style.width=r.width+'px';canvas.style.height=r.height+'px';ctx.setTransform(dpr,0,0,dpr,0,0);redraw()}
+ function page(){return model.pages[model.page]}
+ function snapshot(){return JSON.stringify(model.pages)}
+ function pushUndo(){model.undo.push(snapshot());if(model.undo.length>50)model.undo.shift();model.redo=[]}
+ function redraw(){
+   const r=wrap.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);wrap.classList.remove('grid','lined','blank');wrap.classList.add(page().bg||'grid');
+   for(const s of page().strokes){ctx.beginPath();ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=selected.includes(s.id)?'#176d9d':(s.color||'#17202a');ctx.lineWidth=s.width||2.4;
+     s.pts.forEach((p,i)=>{if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)});ctx.stroke()}
+   $('#pageLabel').textContent=`${model.page+1} / ${model.pages.length}`;$('#paper').value=page().bg||'grid';
+ }
+ async function persist(){await InkDB.put(qid,model)}
+ function point(e){const r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top,p:e.pressure||.5}}
+ function hitStroke(p){
+   let best=null,bd=14;
+   for(const s of page().strokes)for(const a of s.pts){const d=Math.hypot(a.x-p.x,a.y-p.y);if(d<bd){best=s;bd=d}}
+   return best
+ }
+ function down(e){
+   if(e.pointerType==='touch'&&penActive)return;
+   if(e.pointerType==='pen')penActive=true;
+   canvas.setPointerCapture?.(e.pointerId);const p=point(e);
+   if(tool==='pen'){pushUndo();drawing=true;current={id:crypto.randomUUID?.()||Date.now()+Math.random(),color:getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()||'#17202a',width:Math.max(1.8,2.2+(e.pressure||.5)*2.2),pts:[p]};page().strokes.push(current)}
+   else if(tool==='eraser'){const s=hitStroke(p);if(s){pushUndo();page().strokes=page().strokes.filter(x=>x!==s);redraw();persist()}}
+   else if(tool==='select'){
+     const hit=hitStroke(p);
+     if(hit && selected.includes(hit.id)){pushUndo();movingSelection=true;dragStart=p}
+     else {selected=[];selStart=p;box.style.left=p.x+'px';box.style.top=p.y+'px';box.style.width='0';box.style.height='0';box.style.display='block'}
+   }
+ }
+ function move(e){
+   if(e.pointerType==='touch'&&penActive)return;const p=point(e);
+   if(tool==='pen'&&drawing){current.pts.push(p);redraw()}
+   else if(tool==='eraser'&&(e.buttons||e.pressure)){const s=hitStroke(p);if(s){page().strokes=page().strokes.filter(x=>x!==s);redraw()}}
+   else if(tool==='select'&&movingSelection&&dragStart){
+     const dx=p.x-dragStart.x,dy=p.y-dragStart.y;
+     page().strokes.filter(s=>selected.includes(s.id)).forEach(s=>s.pts.forEach(a=>{a.x+=dx;a.y+=dy}));
+     dragStart=p;redraw()
+   } else if(tool==='select'&&selStart){const x=Math.min(selStart.x,p.x),y=Math.min(selStart.y,p.y),w=Math.abs(p.x-selStart.x),h=Math.abs(p.y-selStart.y);Object.assign(box.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'})}
+ }
+ function up(e){
+   if(e.pointerType==='pen')penActive=false;
+   if(tool==='pen'&&drawing){drawing=false;current=null;persist()}
+   if(tool==='eraser')persist();
+   if(tool==='select'&&movingSelection){movingSelection=false;dragStart=null;persist()}
+   else if(tool==='select'&&selStart){const p=point(e),x1=Math.min(selStart.x,p.x),x2=Math.max(selStart.x,p.x),y1=Math.min(selStart.y,p.y),y2=Math.max(selStart.y,p.y);selected=page().strokes.filter(s=>s.pts.some(a=>a.x>=x1&&a.x<=x2&&a.y>=y1&&a.y<=y2)).map(s=>s.id);selStart=null;box.style.display='none';redraw();if(selected.length)toast(`${selected.length} stroke(s) selected — drag a selected stroke to move it`)}
+ }
+ canvas.style.touchAction='none';canvas.oncontextmenu=e=>e.preventDefault();canvas.onpointerdown=down;canvas.onpointermove=move;canvas.onpointerup=up;canvas.onpointercancel=up;
+ $$('.tool[data-tool]').forEach(b=>b.onclick=()=>{tool=b.dataset.tool;$$('.tool[data-tool]').forEach(x=>x.classList.toggle('active',x===b));selected=[];redraw()});
+ function transformSelected(scale){
+   if(!selected.length){toast('Select strokes first');return}
+   pushUndo();
+   const strokes=page().strokes.filter(s=>selected.includes(s.id));
+   const pts=strokes.flatMap(s=>s.pts);
+   const cx=pts.reduce((a,p)=>a+p.x,0)/pts.length, cy=pts.reduce((a,p)=>a+p.y,0)/pts.length;
+   strokes.forEach(s=>s.pts.forEach(p=>{p.x=cx+(p.x-cx)*scale;p.y=cy+(p.y-cy)*scale}));
+   redraw();persist();
+ }
+ $('#copySel').onclick=()=>{
+   if(!selected.length){toast('Select strokes first');return}
+   pushUndo();
+   const originals=page().strokes.filter(s=>selected.includes(s.id)), ids=[];
+   originals.forEach(s=>{const cp=JSON.parse(JSON.stringify(s));cp.id=crypto.randomUUID?.()||String(Date.now()+Math.random());cp.pts.forEach(p=>{p.x+=20;p.y+=20});page().strokes.push(cp);ids.push(cp.id)});
+   selected=ids;redraw();persist();
+ };
+ $('#growSel').onclick=()=>transformSelected(1.12);
+ $('#shrinkSel').onclick=()=>transformSelected(.88);
+ $('#deleteSel').onclick=()=>{if(!selected.length){toast('Select strokes first');return}pushUndo();page().strokes=page().strokes.filter(s=>!selected.includes(s.id));selected=[];redraw();persist()};
+
+ $('#undo').onclick=()=>{if(!model.undo.length)return;model.redo.push(snapshot());model.pages=JSON.parse(model.undo.pop());model.page=Math.min(model.page,model.pages.length-1);selected=[];redraw();persist()};
+ $('#redo').onclick=()=>{if(!model.redo.length)return;model.undo.push(snapshot());model.pages=JSON.parse(model.redo.pop());model.page=Math.min(model.page,model.pages.length-1);selected=[];redraw();persist()};
+ $('#saveInk').onclick=async()=>{await persist();toast('Notebook saved')};
+ $('#clearInk').onclick=()=>{if(confirm('Clear this page?')){pushUndo();page().strokes=[];selected=[];redraw();persist()}};
+ $('#paper').onchange=e=>{page().bg=e.target.value;App.state.settings.paper=e.target.value;save();redraw();persist()};
+ $('#prevPage').onclick=()=>{if(model.page>0){model.page--;selected=[];redraw();persist()}};
+ $('#nextPage').onclick=()=>{if(model.page<model.pages.length-1){model.page++;selected=[];redraw();persist()}};
+ $('#addPage').onclick=()=>{pushUndo();model.pages.splice(model.page+1,0,{bg:page().bg,strokes:[]});model.page++;selected=[];redraw();persist()};
+ $('#dupPage').onclick=()=>{pushUndo();const cp=JSON.parse(JSON.stringify(page()));cp.strokes.forEach(s=>s.id=crypto.randomUUID?.()||Date.now()+Math.random());model.pages.splice(model.page+1,0,cp);model.page++;redraw();persist()};
+ $('#delPage').onclick=()=>{if(model.pages.length===1){toast('Keep at least one page');return}if(confirm('Delete this notebook page?')){pushUndo();model.pages.splice(model.page,1);model.page=Math.max(0,model.page-1);selected=[];redraw();persist()}};
+ // delete selected with keyboard on laptop
+ window.onkeydown=e=>{if((e.key==='Delete'||e.key==='Backspace')&&selected.length){pushUndo();page().strokes=page().strokes.filter(s=>!selected.includes(s.id));selected=[];redraw();persist()}};
+ new ResizeObserver(resize).observe(wrap);resize();
 }
-function initCanvas(key){
- const c=$("#ink"),ctx=c.getContext("2d"); let tool="pen",drawing=false,current=[],strokes=[];
- function size(){const r=c.getBoundingClientRect();c.width=Math.max(600,Math.floor(r.width*devicePixelRatio));c.height=Math.floor(r.height*devicePixelRatio);ctx.scale(devicePixelRatio,devicePixelRatio);redraw()}
- function redraw(){ctx.clearRect(0,0,c.width,c.height);ctx.lineCap="round";ctx.lineJoin="round";for(const s of strokes){ctx.strokeStyle=s.tool==="eraser"?"#ffffff":"#111827";ctx.lineWidth=s.tool==="eraser"?18:2.5;ctx.beginPath();s.points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke()}}
- try{strokes=JSON.parse(localStorage.getItem("ink:"+key)||"[]")}catch{}
- setTimeout(size,0);window.addEventListener("resize",size,{once:true});
- c.onpointerdown=e=>{drawing=true;current=[];c.setPointerCapture(e.pointerId);point(e)}
- c.onpointermove=e=>{if(drawing)point(e)}
- c.onpointerup=e=>{drawing=false;if(current.length){strokes.push({tool,points:current});localStorage.setItem("ink:"+key,JSON.stringify(strokes))}}
- function point(e){const r=c.getBoundingClientRect();current.push({x:e.clientX-r.left,y:e.clientY-r.top});if(current.length>1){const a=current[current.length-2],b=current[current.length-1];ctx.strokeStyle=tool==="eraser"?"#ffffff":"#111827";ctx.lineWidth=tool==="eraser"?18:2.5;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}}
- $$("[data-tool]").forEach(b=>b.onclick=()=>tool=b.dataset.tool);$("#undoInk").onclick=()=>{strokes.pop();localStorage.setItem("ink:"+key,JSON.stringify(strokes));redraw()};$("#clearInk").onclick=()=>{if(confirm("Clear this page?")){strokes=[];localStorage.removeItem("ink:"+key);redraw()}};
-}
-function exportBackup(){
- const blob=new Blob([JSON.stringify({version:1,exported:new Date().toISOString(),progress:state.progress},null,2)],{type:"application/json"});
- const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="cem-mastery-backup.json";a.click();URL.revokeObjectURL(a.href)
-}
-$("#backupBtn").onclick=exportBackup;
-$("#themeBtn").onclick=()=>{state.progress.settings.theme=(state.progress.settings.theme==="dark"?"light":"dark");save();render()};
-$("#importFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(x.progress){state.progress=x.progress;save();render();alert("Backup imported.")}}catch{alert("Invalid backup file.")}};r.readAsText(f)};
-(async function init(){load();DATA=await fetch("./data/content.json").then(r=>r.json());if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js");render()})();
+window.startMock=startMock;window.exportBackup=exportBackup;
+init().catch(e=>{console.error(e);document.querySelector('#view').innerHTML='<div class="card"><h2>App initialization failed</h2><p>Please refresh. If this persists, redeploy all files including the data folder.</p></div>'});
