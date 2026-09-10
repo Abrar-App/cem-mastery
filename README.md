@@ -1,3 +1,7 @@
+# CEM Mastery v0.2.1 — Initialization Fix
+
+This release fixes the startup failure shown in the previous build. The 93 lessons, 372 practice questions and 186 flashcards are bundled directly into `app.js`, so the app no longer depends on fetching the `data/*.json` files during initialization.
+
 # CEM Mastery v0.2
 
 GitHub Pages-ready private PWA.
